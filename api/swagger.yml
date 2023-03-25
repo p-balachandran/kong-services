@@ -1,0 +1,53 @@
+swagger: '2.0'
+info:
+  title: Kong Services
+  description: |-
+   This is a take home assignmet for Kong Konnect. This service will list and retrieve service(s). 
+  version: 0.0.1
+basePath: /v1
+paths:
+  /services:
+    get:
+      summary: 'Get all services'
+      description: 'It returns a list of services'
+      operationId: ServiceList
+      responses:
+        200:
+          description: 'List of Services'
+          schema:
+            $ref: '#/definitions/Services'
+        400:
+          description: Bad Request
+        404:
+          description: Services Not Found
+        500:
+          schema:
+            type: string
+          description: Server Error
+definitions:
+  Services:
+    type: array
+    items:
+      $ref: '#/definitions/Service'
+  Service:
+    type: object
+    properties:
+      serviceId:
+        type: integer
+      name:
+        type: string
+      description:
+        type: string
+      versions:
+        type: array
+        items:
+          $ref: '#/definitions/Version'
+  Version:
+    type: object
+    properties:
+      versionId:
+        type: integer
+      name:
+        type: string
+      description:
+        type: string
