@@ -3,14 +3,20 @@
 package restapi
 
 import (
+	"context"
 	"crypto/tls"
+	"log"
 	"net/http"
+	"time"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
+	"github.com/p-balachandran/kong-services/db"
 	"github.com/p-balachandran/kong-services/restapi/operations"
+
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 //go:generate swagger generate server --target ..\..\kong-services --name KongServices --spec ..\api\swagger.yml --principal interface{}
@@ -20,8 +26,27 @@ func configureFlags(api *operations.KongServicesAPI) {
 }
 
 func configureAPI(api *operations.KongServicesAPI) http.Handler {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+
 	// configure the api here
 	api.ServeError = errors.ServeError
+
+	//setup mongoDB
+	mongodb, err := db.NewMongoDB(ctx)
+	defer func() {
+		if err = mongodb.mc.Disconnect(ctx); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	// Call Ping to verify that the deployment is up and the Client was
+	// configured successfully. As mentioned in the Ping documentation, this
+	// reduces application resiliency as the server may be temporarily
+	// unavailable when Ping is called.
+	if err = mongodb.mc.Ping(ctx, readpref.Primary()); err != nil {
+		log.Fatal(err)
+	}
 
 	// Set your custom logger if needed. Default one is log.Printf
 	// Expected interface func(string, ...interface{})
