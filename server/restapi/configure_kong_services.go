@@ -5,6 +5,7 @@ package restapi
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -14,7 +15,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 
 	"github.com/p-balachandran/kong-services/db"
-	"github.com/p-balachandran/kong-services/restapi/operations"
+	"github.com/p-balachandran/kong-services/server/restapi/operations"
 
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
@@ -47,6 +48,8 @@ func configureAPI(api *operations.KongServicesAPI) http.Handler {
 	if err = mongodb.mc.Ping(ctx, readpref.Primary()); err != nil {
 		log.Fatal(err)
 	}
+
+	fmt.Println("Connected to mongodb successfully ...")
 
 	// Set your custom logger if needed. Default one is log.Printf
 	// Expected interface func(string, ...interface{})

@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-openapi/runtime"
 
-	"github.com/p-balachandran/kong-services/models"
+	"github.com/p-balachandran/kong-services/server/models"
 )
 
 // ServiceListOKCode is the HTTP code returned for type ServiceListOK
